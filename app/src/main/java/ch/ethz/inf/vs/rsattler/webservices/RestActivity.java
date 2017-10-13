@@ -10,6 +10,7 @@ import org.w3c.dom.Text;
 import ch.ethz.inf.vs.a2.http.HttpRawRequest;
 import ch.ethz.inf.vs.a2.sensor.SensorListener;
 import ch.ethz.inf.vs.a2.solution.http.RawHttpSensor;
+import ch.ethz.inf.vs.a2.solution.http.TextSensor;
 
 public class RestActivity extends AppCompatActivity implements SensorListener {
 
@@ -17,7 +18,11 @@ public class RestActivity extends AppCompatActivity implements SensorListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rest);
+
         final RawHttpSensor hrr = new RawHttpSensor();
+
+        //final TextSensor hrr = new TextSensor();
+
         hrr.registerListener(this);
         hrr.getTemperature();
     }

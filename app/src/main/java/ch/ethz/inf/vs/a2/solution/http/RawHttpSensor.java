@@ -36,7 +36,7 @@ public class RawHttpSensor extends AbstractSensor{
 
     @Override
     public double parseResponse(String response) {
-        String s = response.substring(response.lastIndexOf("<li class = \"getter\">Temperature Getter: <span class=\"getterValue\">") + 67).substring(0,4);
+        String s = response.substring(response.lastIndexOf("<li class = \"getter\">Temperature Getter: <span class=\"getterValue\">") + 67).substring(0,5);
         return Double.parseDouble(s);
     }
 
