@@ -1,10 +1,8 @@
 package ch.ethz.inf.vs.rsattler.webservices;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -15,24 +13,27 @@ import ch.ethz.inf.vs.a2.solution.http.JsonSensor;
 import ch.ethz.inf.vs.a2.solution.http.RawHttpSensor;
 import ch.ethz.inf.vs.a2.solution.http.TextSensor;
 
-public class RestActivity extends AppCompatActivity {
+public class RawActivity extends AppCompatActivity implements SensorListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rest);
-    }
-    public void raw(View view) {
-        Intent intent = new Intent(this, RawActivity.class);
-        startActivity(intent);
-    }
-    public void text(View view) {
-        Intent intent = new Intent(this, TextActivity.class);
-        startActivity(intent);
+        setContentView(R.layout.activity_raw);
+
+        final RawHttpSensor hrr = new RawHttpSensor();
+
+        hrr.registerListener(this);
+        hrr.getTemperature();
     }
 
-    public void json(View view) {
-        Intent intent = new Intent(this, JsonActivity.class);
-        startActivity(intent);
+    @Override
+    public void onReceiveSensorValue(double value) {
+        TextView t=(TextView)findViewById(R.id.textView2);
+        t.setText(Double.toString(value));
+    }
+
+    @Override
+    public void onReceiveMessage(String message) {
+
     }
 }

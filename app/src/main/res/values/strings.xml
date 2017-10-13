@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Webservices</string>
+    <string name="title_activity_json">JsonActivity</string>
 </resources>
