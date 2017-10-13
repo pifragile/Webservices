@@ -2,12 +2,34 @@ package ch.ethz.inf.vs.rsattler.webservices;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 
-public class RestActivity extends AppCompatActivity {
+import org.w3c.dom.Text;
+
+import ch.ethz.inf.vs.a2.http.HttpRawRequest;
+import ch.ethz.inf.vs.a2.sensor.SensorListener;
+import ch.ethz.inf.vs.a2.solution.http.RawHttpSensor;
+
+public class RestActivity extends AppCompatActivity implements SensorListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rest);
+        final RawHttpSensor hrr = new RawHttpSensor();
+        hrr.registerListener(this);
+        hrr.getTemperature();
+    }
+
+    @Override
+    public void onReceiveSensorValue(double value) {
+        TextView t=(TextView)findViewById(R.id.textView2);
+        t.setText(Double.toString(value));
+    }
+
+    @Override
+    public void onReceiveMessage(String message) {
+
     }
 }
