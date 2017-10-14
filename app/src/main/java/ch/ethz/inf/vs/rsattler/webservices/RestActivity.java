@@ -21,6 +21,7 @@ public class RestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rest);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
     public void raw(View view) {
         Intent intent = new Intent(this, RawActivity.class);

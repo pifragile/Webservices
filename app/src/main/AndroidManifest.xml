@@ -18,10 +18,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RestActivity" />
-        <activity android:name=".RawActivity" />
-        <activity android:name=".TextActivity" />
-        <activity android:name=".JsonActivity"></activity>
+        <activity
+            android:name=".RestActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".RawActivity"
+            android:parentActivityName=".RestActivity"/>
+        <activity
+            android:name=".TextActivity"
+            android:parentActivityName=".RestActivity" />
+        <activity
+            android:name=".JsonActivity"
+            android:parentActivityName=".RestActivity" />
+        <activity
+            android:name=".RestServerActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

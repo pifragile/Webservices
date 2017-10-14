@@ -17,4 +17,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RestActivity.class);
         startActivity(intent);
     }
+
+    public void task3(View view) {
+        Intent intent = new Intent(this, RestServerActivity.class);
+        startActivity(intent);
+    }
 }
