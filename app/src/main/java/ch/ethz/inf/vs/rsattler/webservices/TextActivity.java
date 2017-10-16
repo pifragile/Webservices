@@ -19,6 +19,7 @@ public class TextActivity extends AppCompatActivity implements SensorListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         final TextSensor hrr = new TextSensor();

@@ -18,6 +18,7 @@ public class JsonActivity extends AppCompatActivity implements SensorListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final JsonSensor hrr = new JsonSensor();
 

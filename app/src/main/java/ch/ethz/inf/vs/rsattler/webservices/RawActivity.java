@@ -19,6 +19,7 @@ public class RawActivity extends AppCompatActivity implements SensorListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_raw);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final RawHttpSensor hrr = new RawHttpSensor();
 
