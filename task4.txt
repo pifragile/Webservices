@@ -1,0 +1,77 @@
+1a. 
+   The Request-Line begins with a method token, followed by the
+   Request-URI and the protocol version, and ending with CRLF. The
+   elements are separated by SP characters. No CR or LF is allowed
+   except in the final CRLF sequence.
+
+        Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+
+1b.
+	GET / HTTP/1.1\r\n
+    Host: 192.168.1.1:8080\r\n\r\n
+
+1c.
+	1. Chacheablility with the Cache-Conrtol field
+	2. Layered System with e.g. Proxy-Authorization or Via
+
+-----------------------------------------------------------------------------
+
+2a.
+	Client: One can use the Socket class to connect to a server
+		Socket s = New Socket(host,port);
+
+	Server: One can use the ServerSocket class to accept incoming connections:
+		ServerSocket s = new ServerSocket(port);
+		s.accept();
+
+2b.
+	Blocking behavior means that the code waits for "something" to finish.
+	For example, if a client sends a request to a server, and and the code
+	only continues when it gets the answer, the code "waits" or "blocks".
+	In InputStream read() is blocking. So if you want to read 8 bytes
+	the InputStream blocks until all 8 bytes are ready. To avoid blocking
+	one can use the available() method which states how many bytes can be read
+	without blocking.
+	In output stream flush() is blocking which immediately writes out all
+	buffered bytes.
+
+-----------------------------------------------------------------------------
+
+3a.
+	false -  REST is not a protocol but rather an architectural style
+
+3b.
+	false - exactly the opposite
+
+3c.
+	true
+
+3d. false - json is one possible data representation among many other from 
+	which the client can chose
+
+-----------------------------------------------------------------------------
+
+4. TODO
+
+-----------------------------------------------------------------------------
+
+5a.
+	10.0.2.15
+	Each instance of the emulator runs behind a virtual router/firewall service 
+	that isolates it from your development machine network interfaces and settings 
+	and from the internet. An emulated device can't see your development machine or 
+	other emulator instances on the network. Instead, it sees only that it is connected 
+	through Ethernet to a router/firewall.
+
+5b.
+	127.0.0.1 refers to the device on which the code is running, in this case the emulator.
+
+5c.
+	10.0.2.2
+
+5d.
+	To communicate with an emulator instance behind its virtual router, you need to set up 
+	network redirection on the virtual router.
+
+	
+
