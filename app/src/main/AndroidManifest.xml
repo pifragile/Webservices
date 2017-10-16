@@ -20,10 +20,10 @@
         </activity>
         <activity
             android:name=".RestActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".RawActivity"
-            android:parentActivityName=".RestActivity"/>
+            android:parentActivityName=".RestActivity" />
         <activity
             android:name=".TextActivity"
             android:parentActivityName=".RestActivity" />
@@ -32,7 +32,12 @@
             android:parentActivityName=".RestActivity" />
         <activity
             android:name=".RestServerActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
+
+        <service
+            android:name=".RestServerService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
