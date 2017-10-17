@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -12,16 +14,26 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Scanner;
 
 public class RestServerService extends Service {
 
+    private ServerSocket serverSocket;
     private static final int NOTIFICATION_ID = 10;
+
+    private Thread serverThread;
 
     public RestServerService() {
     }
@@ -31,33 +43,33 @@ public class RestServerService extends Service {
 
         NetworkInterface networkInterface;
 
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+
         try {
             networkInterface = NetworkInterface.getByName("wlan0");
             if (networkInterface == null) {
-                Log.d("Service", "wlan0 not found");
                 networkInterface = NetworkInterface.getByIndex(0);
-                Log.d("Service", "using "+networkInterface.getName());
             }
 
             InetAddress address = networkInterface.getInetAddresses().nextElement();
 
-            try (ServerSocket socket = new ServerSocket(8088, 50, address)) {
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
+            broadcastIntent.putExtra("ip", address);
+            broadcastIntent.putExtra("port", 8088);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.serverSocket = new ServerSocket(8088, 50, address);
 
-        } catch (SocketException e) {
+            serverThread = new RestServerThread(serverSocket);
+            serverThread.start();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         showNotification();
-
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
-        broadcastIntent.putExtra("ip", "test");
-        broadcastIntent.putExtra("port", "8888");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 
         return START_STICKY;
     }
@@ -71,6 +83,13 @@ public class RestServerService extends Service {
     @Override
     public void onDestroy() {
         destroyNotification();
+        serverThread.interrupt();
+
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showNotification() {
@@ -92,4 +111,5 @@ public class RestServerService extends Service {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_ID);
     }
+
 }
