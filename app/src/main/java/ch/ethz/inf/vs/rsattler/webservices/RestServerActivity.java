@@ -9,10 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+import java.net.InetAddress;
 
 public class RestServerActivity extends AppCompatActivity {
 
     BroadcastReceiver receiver;
+
+    TextView addressView;
 
 
     @Override
@@ -21,10 +26,15 @@ public class RestServerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rest_server);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        addressView = (TextView) findViewById(R.id.address_view);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("TEST", "Broadcast received");
+                InetAddress address = (InetAddress) intent.getSerializableExtra("ip");
+                int port = intent.getIntExtra("port", -1);
+
+                addressView.setText(address.toString()+":"+port);
             }
         };
         IntentFilter filter = new IntentFilter("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
@@ -32,7 +42,7 @@ public class RestServerActivity extends AppCompatActivity {
     }
 
     public void toggleService(View view) {
-        // if stop if service is running
+        // stop if service is running
         boolean serviceStopped = stopService(new Intent(this, RestServerService.class));
 
         // start service only if it wasn't running
