@@ -55,9 +55,10 @@ public class RestResponseTask extends AsyncTask<Socket, Void, Void> {
     }
 
     private static class Request {
-        String[] lines;
-        Method method;
-        String path;
+        private String[] lines;
+        private Method method;
+        private String path;
+        private RestResource resource;
 
         int status = 100;
 
@@ -93,11 +94,11 @@ public class RestResponseTask extends AsyncTask<Socket, Void, Void> {
                 return;
             }
 
-            Pattern pathPattern = Pattern.compile("\\s/[\\w\\.\\/]*\\s");
+            Pattern pathPattern = Pattern.compile("\\s(/[\\w\\.\\/]*)\\s");
             Matcher pathMatcher = pathPattern.matcher(lines[0]);
 
             if (pathMatcher.find()) {
-                this.path = pathMatcher.group(0).trim();
+                this.path = pathMatcher.group(1);
             } else {
                 status = 404;
             }
@@ -117,42 +118,61 @@ public class RestResponseTask extends AsyncTask<Socket, Void, Void> {
         }
 
         private Request processGetRequest() {
+            Log.d("Service", "Processing GET request");
 
             boolean acceptsHtml = false;
             for (int i = 1; i < lines.length; i++) {
-                Pattern acceptLine = Pattern.compile("^Accept:(.*)text\\/html");
+                Pattern acceptLine = Pattern.compile("^Accept:(.*) text\\/html");
                 Matcher m = acceptLine.matcher(lines[i]);
                 if (m.find()) acceptsHtml = true;
             }
 
             if (!acceptsHtml) {
                 this.status = 415;
+                Log.d("Service", "Error: "+415);
                 return this;
             }
+
+            Log.d("Service", "Getting Resource");
+            resource = RestResource.getResourceFromPath(path);
 
             return this;
         }
 
         private Request processPostRequest() {
+
             return this;
         }
 
         public Response getResponse() {
-            return new Response();
+            if (status < 200) {
+                status = 200;
+            }
+            return new Response(resource);
         }
     }
 
     private static class Response {
+        private RestResource resource;
+        private int status;
+
+        Response(RestResource resource) {
+            this.resource = resource;
+        }
 
         private static final String newLine = System.getProperty("line.separator");
 
         public String compile() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("HTTP/1.1 200 OK").append(newLine);
-            builder.append("Content-Type: text/html").append(newLine);
-            builder.append("\r\n").append(newLine);
-            builder.append("<p> Hello world! </p>").append(newLine);
-            return builder.toString();
+            if (status >= 300) {
+                return "HTTP/1.1 "+status+" ";
+            }
+            return "";
+//            StringBuilder builder = new StringBuilder();
+//            builder.append("HTTP/1.1 200 OK").append(newLine);
+//            builder.append("Content-Type: text/html").append(newLine);
+//            builder.append("\r\n").append(newLine);
+//            builder.append("<p> Hello world! </p>").append(newLine);
+//            return builder.toString();
         }
 
     }
