@@ -18,6 +18,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    //LS
+    public void task2(View view) {
+        Intent intent = new Intent(this, SoapActivity.class);
+        startActivity(intent);
+    }
+
     public void task3(View view) {
         Intent intent = new Intent(this, RestServerActivity.class);
         startActivity(intent);

@@ -34,6 +34,10 @@
             android:name=".RestServerActivity"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".SoapActivity"
+            android:parentActivityName=".MainActivity" />
+
         <service
             android:name=".RestServerService"
             android:enabled="true"
