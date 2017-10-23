@@ -1,0 +1,4 @@
+</id>
+</ns2:getSpot>
+</S:Body>
+</S:Envelope>
