@@ -68,7 +68,7 @@ public class SoapSensor extends AbstractSensor {
                 try {
                     httpTransport2.call(SOAP_ACTION2, envReqData);
                     SoapObject response2 = (SoapObject) envReqData.getResponse();
-                    sendMessage("Value retrieved from " + SPOT);
+                    sendMessage("Value retrieved from " + SPOT + " (SoapSensor)");
                     //sendValue(parseResponse(response2.getPropertyAsString("temperature")));
                     return response2.getPropertyAsString("temperature");
 

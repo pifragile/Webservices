@@ -1,31 +1,18 @@
 package ch.ethz.inf.vs.a2.sensor;
 
-
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Vector;
-
-import ch.ethz.inf.vs.rsattler.webservices.R;
-//LS
 
 public class XmlSensor extends AbstractSensor {
 
@@ -33,30 +20,49 @@ public class XmlSensor extends AbstractSensor {
     private HttpURLConnection connection;
     private OutputStream outputStream;
     private BufferedReader buffReader;
+
     private String req1;
     private String req2;
     private String req21;
     private String req22;
     private String response1 = "";
     private String response2 = "";
-    private String response22 = "";
-    private String response23 = "";
     private String spot = "";
 
     String temp;
-    private int i = 0;
 
-    // for the implementation of the parseResponse(String response) method use the XmlPullParser,
-    // which is also delivered by Android.
     @Override
     public double parseResponse(String response) {
-        return Double.parseDouble(response);
+
+        String temperature = "0";
+        Boolean rightPlace = false;
+        try {
+            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+            //parserFactory.setNamespaceAware(true);
+            XmlPullParser pullParser = parserFactory.newPullParser();
+            pullParser.setInput(new StringReader(response));
+
+            int eventType = pullParser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                if (eventType == XmlPullParser.START_TAG && pullParser.getName().equals("temperature")) rightPlace = true;
+                if (eventType == XmlPullParser.TEXT && rightPlace) {
+                    temperature = pullParser.getText();
+                    break;
+                }
+                eventType = pullParser.next();
+            }
+        }
+        catch (XmlPullParserException e) { e.printStackTrace(); }
+        catch (IOException e) { e.printStackTrace();}
+
+        return Double.parseDouble(temperature);
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public String executeRequest() throws Exception {
 
+        // get the xml queries.
         setStrings();
 
         // 1. CHECK WHICH SPOTS ARE AVAILABLE.
@@ -75,10 +81,9 @@ public class XmlSensor extends AbstractSensor {
         buffReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         while((temp = buffReader.readLine()) != null) response1 += temp;
         buffReader.close();
-        Log.wtf("tag", response1);
         //} catch (Exception e) {}
 
-        // "analyze" the answer.
+        // check which spots are available.
         if (response1.contains("Spot3")) { spot = "Spot3"; req2 = req21 + spot + req22;}
         else if(response1.contains("Spot4")) { spot = "Spot4"; req2 = req21 + spot + req22;}
         else { sendMessage("No Spot could be contacted."); return "0";}
@@ -98,9 +103,11 @@ public class XmlSensor extends AbstractSensor {
         buffReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         while((temp = buffReader.readLine()) != null) response2 += temp;
         buffReader.close();
-        Log.wtf("tag", response2);
+        sendMessage("Value retrieved from " + spot + " (XMLSensor)");
+        return response2;
 
-        // "analyze" the answer.
+        /*
+        // version without xml pull parser.
         int x;
         for (x=0; x<response2.length(); x++) { if (response2.regionMatches(x,"<temperature>",0,13)) break; }
         response22 = response2.substring(x+13);
@@ -109,15 +116,11 @@ public class XmlSensor extends AbstractSensor {
         response23 = response22.substring(0,x);
         Log.wtf("tag", response23);
 
-        sendMessage("Value retrieved super fast from " + spot);
+        sendMessage("Value retrieved from " + spot + " (XMLSensor)");
         return response23;
-
-
-
-    //return "0";
+        */
     }
 
-    // tried to read the strings directly from text files, but did not work properly.
     public void setStrings() {
 
         // getDiscoveredSpots()
@@ -132,8 +135,4 @@ public class XmlSensor extends AbstractSensor {
         // getSpot(..), part 2
         req22 = "</id></ns2:getSpot></S:Body></S:Envelope>";
     }
-
-
-
-
 }

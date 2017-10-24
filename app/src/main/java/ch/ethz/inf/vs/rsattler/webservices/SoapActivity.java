@@ -38,23 +38,22 @@ public class SoapActivity extends AppCompatActivity implements SensorListener {
         currentSensor = xmlSensor;
         currentSensor.registerListener(this);
         currentSensor.getTemperature();
-        Log.wtf("Tag", "Xml sensor asked");
+        //Log.wtf("Tag", "Xml sensor asked");
     }
 
-    //LS
     public void askSoapSensor(View view) {
 
         currentSensor.unregisterListener(this);
         currentSensor = soapSensor;
         currentSensor.registerListener(this);
         currentSensor.getTemperature();
-        Log.wtf("Tag", "Soap sensor asked");
+        //Log.wtf("Tag", "Soap sensor asked");
     }
 
     public void onReceiveSensorValue(double value) {
             t1 = (TextView)findViewById(R.id.textView5);
             t1.setText(Double.toString(value));
-            Log.wtf("Tag", "Sensor value received.");
+            //Log.wtf("Tag", "Sensor value received.");
     }
 
     public void onReceiveMessage(String message) {
@@ -67,7 +66,7 @@ public class SoapActivity extends AppCompatActivity implements SensorListener {
                 t2.setText(message);
             }
         });
-        Log.wtf("Tag", message);
+        //Log.wtf("Tag", message);
     }
 }
 
