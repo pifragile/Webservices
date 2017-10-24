@@ -22,6 +22,9 @@ import ch.ethz.inf.vs.a2.sensor.SensorType;
  */
 public class RestResource implements SensorEventListener {
 
+    /**
+     * The HTML header
+     */
     private final static String HTML_START = "<!DOCTYPE html>" +
             "<html>" +
             "<head>" +
@@ -36,8 +39,14 @@ public class RestResource implements SensorEventListener {
             "</head>" +
             "<body>" +
             "<h1>REST Server</h1>";
+    /**
+     * The HTML footer
+     */
     private final static String HTML_END = "</body></html>";
 
+    /**
+     * Different ResourceTypes
+     */
     private enum ResourceType {
         FAVICON, HOME, SENSOR_OVERVIEW, SENSOR, ACTUATOR_OVERVIEW, ACTUATOR
     }
@@ -165,6 +174,7 @@ public class RestResource implements SensorEventListener {
                 return scanner.hasNext() ? scanner.next() : "";
 
             case SENSOR_OVERVIEW:
+                // Get Sensors and add them to the HTML
                 List<Sensor> sensors = getSensors();
                 builder = new StringBuilder();
                 builder.append("<ul>");
@@ -176,6 +186,7 @@ public class RestResource implements SensorEventListener {
                 return builder.toString();
 
             case SENSOR:
+                // Get Sensor, await values and add it to the HTML
                 Sensor sensor = sensorManager.getSensorList(Sensor.TYPE_ALL).get(id);
                 SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
                 sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
@@ -201,6 +212,7 @@ public class RestResource implements SensorEventListener {
                 return builder.toString();
 
             case ACTUATOR_OVERVIEW:
+                // Get Actuators and add them to the HTML
                 List<Actuator> actuators = getActuators();
                 builder = new StringBuilder();
                 builder.append("<ul>");
@@ -212,6 +224,7 @@ public class RestResource implements SensorEventListener {
                 return builder.toString();
 
             case ACTUATOR:
+                // Added Actuator form to the HTML
                 Actuator actuator = getActuators().get(id);
                 return actuator.getHtml();
 
@@ -220,7 +233,7 @@ public class RestResource implements SensorEventListener {
         }
     }
 
-    public String write() {
+    public String toHtml() {
         return HTML_START +
                 getHomeNavigation() +
                 getParentNavigation() +

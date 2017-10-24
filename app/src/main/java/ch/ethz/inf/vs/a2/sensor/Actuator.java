@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Container for the Actuators
+ */
 public class Actuator {
 
     public static List<Actuator> getActuators(Context context) {
@@ -71,6 +73,10 @@ public class Actuator {
         }
     }
 
+    /**
+     * Extract parameters from POST Request body
+     * @param post POST Request body
+     */
     public void setFromPost(String post) {
         switch (type) {
             case VIBRATOR:

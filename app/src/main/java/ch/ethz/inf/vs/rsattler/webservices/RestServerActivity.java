@@ -13,9 +13,18 @@ import android.widget.TextView;
 
 import java.net.InetAddress;
 
+/**
+ * Activity to start and stop the RestServerService
+ */
 public class RestServerActivity extends AppCompatActivity {
 
+    /**
+     * BroadcastReceiver to get the address and port from the Service
+     */
     BroadcastReceiver configReceiver;
+    /**
+     * Receiver to get the stop message from the Service
+     */
     BroadcastReceiver stopReceiver;
 
     TextView addressView;
@@ -29,6 +38,7 @@ public class RestServerActivity extends AppCompatActivity {
 
         addressView = (TextView) findViewById(R.id.address_view);
 
+        // Setup the config and stop Receivers
         configReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -51,15 +61,23 @@ public class RestServerActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(configReceiver, configFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, stopFilter);
 
+        // Request the current configuration, answer expected only if the Service is running
         sendConfigRequest();
     }
 
+    /**
+     * Send the ConfigRequest to the Service. SERVER_CONFIGURATION broadcast expected if the Service is sunning
+     */
     public void sendConfigRequest() {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.CONFIG_REQUEST");
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 
+    /**
+     * Button ClickHandler to toggle the Service
+     * @param view
+     */
     public void toggleService(View view) {
         // stop if service is running
         boolean serviceStopped = stopService(new Intent(this, RestServerService.class));
@@ -73,6 +91,7 @@ public class RestServerActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        // unregister the BroadcastReceivers
         LocalBroadcastManager.getInstance(this).unregisterReceiver(configReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(stopReceiver);
         super.onDestroy();

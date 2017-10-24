@@ -31,15 +31,25 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Service to provide the RestServer
+ */
 public class RestServerService extends Service {
 
+    /**
+     * BroadcastReceiver to receive configuration requests
+     */
     BroadcastReceiver receiver;
 
-    private ServerSocket serverSocket;
     private static final int NOTIFICATION_ID = 10;
+
+    private ServerSocket serverSocket;
     private InetAddress address;
     private int port = 8088;
 
+    /**
+     * Thread in which the Server is running
+     */
     private Thread serverThread;
 
     public RestServerService() {
@@ -48,12 +58,13 @@ public class RestServerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        NetworkInterface networkInterface;
-
         try {
-            networkInterface = NetworkInterface.getByName("wlan0");
+            // Get the Wifi NetworkInterface
+            NetworkInterface networkInterface = NetworkInterface.getByName("wlan0");
 
-            if (networkInterface == null || networkInterface.getInetAddresses().hasMoreElements()) {
+            // If the Interface isn't null get ServerSocket and start RestServerThread
+            // else show toast to ask the user to connect to Wifi first
+            if (networkInterface != null || networkInterface.getInetAddresses().hasMoreElements()) {
                 address = networkInterface.getInetAddresses().nextElement();
                 sendBroadcast();
 
@@ -73,6 +84,7 @@ public class RestServerService extends Service {
             e.printStackTrace();
         }
 
+        // Configure the BroadcastReceiver to handle CONFIG_REQUEST
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -92,6 +104,9 @@ public class RestServerService extends Service {
         return null;
     }
 
+    /**
+     * Sends Broadcast containing the address and the port on which the Server is running.
+     */
     private void sendBroadcast() {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
@@ -102,13 +117,16 @@ public class RestServerService extends Service {
 
     @Override
     public void onDestroy() {
+        // Unregister the BroadcastReceiver
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 
+        // Destroy the notification
         destroyNotification();
         if (serverThread != null) {
             serverThread.interrupt();
         }
 
+        // Close ServerSocket
         if (serverSocket != null) {
             try {
                 serverSocket.close();
@@ -117,11 +135,15 @@ public class RestServerService extends Service {
             }
         }
 
+        // Send SERVER_STOPPED broadcast
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.SERVER_STOPPED");
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 
+    /**
+     * Show a notification with the current server configuration
+     */
     private void showNotification() {
         android.support.v4.app.NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_server)
@@ -137,6 +159,9 @@ public class RestServerService extends Service {
         nm.notify(NOTIFICATION_ID, builder.build());
     }
 
+    /**
+     * Destroys the notification
+     */
     private void destroyNotification() {
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_ID);
