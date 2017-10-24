@@ -15,7 +15,8 @@ import java.net.InetAddress;
 
 public class RestServerActivity extends AppCompatActivity {
 
-    BroadcastReceiver receiver;
+    BroadcastReceiver configReceiver;
+    BroadcastReceiver stopReceiver;
 
     TextView addressView;
 
@@ -28,17 +29,35 @@ public class RestServerActivity extends AppCompatActivity {
 
         addressView = (TextView) findViewById(R.id.address_view);
 
-        receiver = new BroadcastReceiver() {
+        configReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 InetAddress address = (InetAddress) intent.getSerializableExtra("ip");
                 int port = intent.getIntExtra("port", -1);
 
-                addressView.setText(address.toString()+":"+port);
+                addressView.setText(address.getHostAddress()+":"+port);
             }
         };
-        IntentFilter filter = new IntentFilter("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+
+        stopReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                addressView.setText("");
+            }
+        };
+
+        IntentFilter configFilter = new IntentFilter("ch.ethz.inf.vs.rsattler.webservices.SERVER_CONFIGURATION");
+        IntentFilter stopFilter = new IntentFilter("ch.ethz.inf.vs.rsattler.webservices.SERVER_STOPPED");
+        LocalBroadcastManager.getInstance(this).registerReceiver(configReceiver, configFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, stopFilter);
+
+        sendConfigRequest();
+    }
+
+    public void sendConfigRequest() {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("ch.ethz.inf.vs.rsattler.webservices.CONFIG_REQUEST");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 
     public void toggleService(View view) {
@@ -54,7 +73,8 @@ public class RestServerActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(configReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(stopReceiver);
         super.onDestroy();
     }
 }

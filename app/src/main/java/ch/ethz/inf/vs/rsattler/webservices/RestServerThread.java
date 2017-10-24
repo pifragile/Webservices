@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.rsattler.webservices;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import java.io.IOException;
@@ -11,10 +12,12 @@ import java.util.LinkedList;
 
 class RestServerThread extends Thread {
 
+    private Context context;
     private ServerSocket serverSocket;
     private LinkedList<AsyncTask> tasks = new LinkedList<>();
 
-    RestServerThread(ServerSocket serverSocket) {
+    RestServerThread(Context context, ServerSocket serverSocket) {
+        this.context = context;
         this.serverSocket = serverSocket;
     }
 
@@ -26,7 +29,7 @@ class RestServerThread extends Thread {
                 try {
                     Socket socket = serverSocket.accept();
 
-                    RestResponseTask task = new RestResponseTask(this);
+                    RestResponseTask task = new RestResponseTask(context, this);
                     task.execute(socket);
                     addTask(task);
                 } catch (SocketTimeoutException e) {
